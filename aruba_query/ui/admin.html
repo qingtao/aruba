@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="author" content="wuqingtao@sf-excodess.com">
+	<title>在线PC统计系统</title>
+	<link href="static/bootstrap/css/bootstrap.min.css" rel="stylesheet"> 
+	<style>
+		body {
+			margin:0 auto;
+			padding-right: 15px;
+			padding-left: 15px;
+			font-family: 微软雅黑;
+			background-color: #fefefe;
+		}
+		
+		.margin_top {
+			margin-top: 66px;
+		}
+        .iborder-left {
+            border-left: 1px solid #e5e5e5;
+        }
+		.td_center {
+			text-align: center;
+		}
+		input[type=number]::-webkit-inner-spin-button {
+			-webkit-appearance: none;
+		}
+        .affix {
+            top: 60px;
+        }
+	</style>
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <span class="navbar-brand" onmouseover="javascript:void(0);"><strong>在线PC检查系统</strong></span>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse pull-right">
+          <ul class="nav navbar-nav">    
+            <li><a href="index.html">统计</a></li>
+			<li class="active"><a href="admin.html">管理</a></li>
+          </ul>
+        </div>
+    </div>
+</nav>
+<div class="container margin_top">
+    <!--<legend id="title" style="margin-bottom: 0px;">节点管理</legend>-->
+	<div class="row">
+        <div class="col-xs-9">
+                <table class="table table-responsive table-condensed table-striped" id="routerInfo" style="table-layout:fixed; overflow:hidden;">
+                    <caption>
+                        <!--<span id="router">节点信息如下:</span>-->
+                    </caption>
+                <colgroup>
+                    <col style="width: 5%;">
+                    <col style="width: 10%;">
+                    <col style="width: 20%;">
+                    <col style="width: 15%;">
+                    <col style="width: 15%;">
+                    <col style="width: 20%;">
+                    <col style="width: 9%;">
+                    <col style="width: 0%;">
+                </colgroup>
+                <thead>
+                    <tr class="ctheader">
+                        <th>#</th>
+                        <th>代码</th>
+                        <th style="overflow:hidden;">名称</th>
+                        <th>内网网关</th>
+                        <th>外网ip</th>
+                        <th style="overflow:hidden;">区域位置</th>
+                        <th style="overflow:hidden;">运营商</th>
+                        <th class="hide">auto</th>
+                    </tr>
+                </thead>
+                <tbody id="routers"></tbody>
+            </table>
+        </div>
+        <div class="col-xs-3">
+            <div data-spy="affix" data-offset-top="150">
+            <span>
+                <button id="enableEdit" type="button" class="btn btn-sm btn-default">编辑</button>
+            </span>
+            &nbsp;&nbsp;
+            <span id="tishi">双击左侧的每行记录,同步已有数据</span>
+            <div id="routerChange" style="padding-top:15px">
+            <form class="form-horizontal" role="form" name="cc" id="cc">
+                <div class="form-group">
+                    <label for="code" class="control-label">代码：</label>
+                    <input type="text" placeholder="code" class="form-control" id="code" name="code">
+                    <p class="help-block"></p>
+                </div>
+                <div class="form-group">
+                    <label for="name" class="control-label">名称：</label>
+                    <input type="text" placeholder="name" class="form-control" id="name" name="name">
+                    <p class="help-block"></p>
+                </div>
+                <div class="form-group">
+                    <label for="gateway" class="control-label">内网网关：</label>
+                    <input type="text" placeholder="gateway" class="form-control" id="gateway" name="gateway">
+                    <p class="help-block"></p>
+                </div>
+                <div class="form-group hide">
+                    <label for="wanip" class="control-label">外网IP：</label>
+                    <input type="text" placeholder="wanip" class="form-control" id="wanip" name="wanip">
+                    <p class="help-block"></p>
+                </div>
+                <div class="form-group">
+                    <label for="area" class="control-label">区域位置：</label>
+                    <input type="text" placeholder="area" class="form-control" id="area" name="area">
+                    <p class="help-block"></p>
+                </div>
+                <div class="form-group">
+                    <label for="service_provider" class="control-label">运营商：</label>
+                    <input type="text" placeholder="service provider" class="form-control" id="service_provider" name="service_provider">
+                    <p class="help-block"></p>
+                </div>
+                <div class="form-group">
+                    <label for="autou_pdate" class="control-label">是否自动更新：
+                    <input type="checkbox" id="auto_update" name="auto_update" value="1">
+                    <p class="help-block"></p>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <button id="commit" type="button" class="btn btn-default btn-sm" onclick="update()">更新</button>
+                    <!--<button id="cannel" type="button" class="btn btn-default btn-sm" onclick="initValue()">重置</button>-->
+                </div>
+            </form>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="static/jquery.min.js"></script>
+<script src="static/bootstrap/js/bootstrap.min.js"></script>
+<script>
+function sortRouters(a, b) {
+    if (a.code < b.code) {
+        return -1
+    }
+    return 1
+}
+
+function router(key, code, name, gateway, wanip, area, sp, au) {
+    s = '<tr class="add" style="overflow: hidden;">' +
+		'<td>' + key + '</td>' + 
+		'<td>' + code + '</td>' + 
+		'<td style="overflow:hidden;">' + name + '</td>' + 
+		'<td>' + gateway + '</td>' + 
+		'<td>' + wanip + '</td>' + 
+		'<td style="overflow:hidden;">' + area + '</td>' + 
+		'<td style="overflow:hidden;">' + sp + '</td>' + 
+        '<td class="hide">' + au + '</td>' +
+		'</tr>';
+	return s
+}
+
+function update() {
+    var value = {};
+    value.code = $("#code").val();
+    value.name = $("#name").val();
+    value.gateway = $("#gateway").val();
+    value.area = $("#area").val();
+    value.service_provider = $("#service_provider").val();
+    if ($("#auto_update").prop("checked")) {
+        value.auto_update = "yes";
+    } else {
+        value.auto_update = "no";
+    }
+
+    var updateRouter = $.post("admin/r/u", value, null, "json");
+    var str = '更新节点信息';
+    updateRouter.done(function(data) {
+        str += '[成功] code: ' + value.code + '\nname: ' + value.name + '\ngateway: ' + value.gateway + '\narea: ' + value.area + '\nservice_provider: ' + value.service_provider + '\nauto_update: ' + value.auto_update;
+        alert(str);
+    });
+    updateRouter.fail(function(data) {
+        str += '[失败] code: ' + value.code;
+        var err = JSON.stringify(data.responseText);
+        str += '\n' + err;
+        alert(str);
+    });
+}
+
+function initValue(code, name, gateway, area, sp, au) {
+    $("#code").val(code);
+    $("#name").val(name);
+    $("#gateway").val(gateway);
+    $("#area").val(area);
+    $("#service_provider").val(sp);
+    if (au == 0) {
+        $("#auto_update").prop("checked", false);
+    } else {
+        $("#auto_update").prop("checked", true);
+    }
+
+    $("#routerChange").show();
+}
+
+function getRouters() {
+    var rs = $.getJSON("admin/r/g", function(data) {
+            data.sort(sortRouters);
+            $.each(data, function(k,v) {
+            s = router(k+1, v.code, v.name, v.gateway, v.wanip, v.area, v.service_provider, v.auto_update)
+            $("#routers").append(s)
+        })
+    });
+
+    rs.fail(function() {
+        $("#routers").parent().html('<p>获取节点信息失败</p>');
+    });
+}
+
+
+$(document).ready(function() {
+    getRouters();
+
+    var enableEdit = false;
+
+    $("#tishi").hide();
+    $("#routerChange").hide();
+
+    $("#enableEdit").click(function() {
+        if (enableEdit) {
+            $("#routerChange").hide();
+            $("#tishi").hide();
+            enableEdit = false;
+        } else {
+            $("#tishi").show();
+            enableEdit = true;
+        }
+        $("#enableEdit").toggleClass("btn-warning");
+    });
+
+    $("#routers").on("dblclick", "tr", (function() {
+        if (enableEdit) {
+            //console.log($(this).html());
+            var r = $(this).find("td")
+            var code = r.eq(1).text();
+            var name = r.eq(2).text();
+            var gateway = r.eq(3).text();
+            var area = r.eq(5).text();
+            var sp = r.eq(6).text();
+            var au = r.eq(7).text();
+            initValue(code, name, gateway, area, sp, au);
+        }
+    }));
+})
+</script>
+</body>
+</html>

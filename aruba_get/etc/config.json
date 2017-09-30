@@ -1,0 +1,26 @@
+{
+  "debug": false,
+  "hour": 23,
+  "minute": 8,
+  "timeout": 10,
+  "airwave": {
+    "address": "58.25.3.14",
+    "user": "J-Admin",
+    "password": "SF@admin123",
+    "ap_folder_id": 32
+  },
+  "rap3": {
+    "path": "swarm.cgi",
+    "user": "admin",
+    "passwd": "admin",
+    "cmd": "%27show%20clients%20wired%27",
+    "filter": true
+  },
+  "database": {
+    "host": "127.0.0.1",
+    "port": "3306",
+    "user": "root",
+    "password": "123456",
+    "db": "aruba"
+  }
+}

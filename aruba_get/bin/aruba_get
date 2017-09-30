@@ -1,0 +1,81 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:          aruba_get
+# Required-Start:    $remote_fs
+# Required-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: aruba_get check the hosts online or not.
+# Description:        check every day
+### END INIT INFO
+
+. /lib/lsb/init-functions
+
+BASE="/usr/local/aruba_get"
+ARUBAPID="${BASE}/tmp/aruba.pid"
+NAME="aruba_get"
+
+do_status() {
+    if test -f $1; then
+        pid=`cat $1`
+        comm=`ps --no-heading -p $pid -o comm`
+        if test a$comm = a$NAME; then
+            return 0
+        else
+            return 1
+        fi
+    fi
+    return 10
+}
+
+case $1 in
+    start)
+        if do_status $ARUBAPID; then
+            log_warning_msg "$0 aruba_get already running"
+            exit 0
+        fi
+        ${BASE}/$NAME > /dev/null 2>&1 &
+        sleep 3
+        if do_status $ARUBAPID; then
+            log_success_msg "Start $NAME"
+            exit 0
+        fi
+        log_failure_msg "Start $NAME"
+        exit 1
+        ;;
+    stop)
+        if do_status $ARUBAPID; then
+            pida=`cat $ARUBAPID`
+            kill $pida
+            sleep 2
+            comma=`ps --no-heading -p $pida -o comm`
+            if test x$comma = x; then
+                rm -f $ARUBAPID
+                log_success_msg "Stop $NAME"
+                exit 0
+            else
+                log_failure_msg "Stop $NAME"
+                exit 1
+            fi
+        fi
+        log_warning_msg "$NAME not running"
+        exit 0
+        ;;
+    restart)
+        $0 stop
+        $0 start 
+        ;;
+    status)
+        if do_status $ARUBAPID; then
+            log_success_msg "$NAME is running: `cat $ARUBAPID`"
+        else
+            log_warning_msg "$NAME not running"
+        fi
+        ;;
+    *)
+        echo "Usage: $NAME (start|stop|restart|status)"
+        exit 1
+esac
+
+
